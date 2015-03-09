@@ -1,0 +1,23 @@
+{
+  "name": "minima",
+  "version": "0.0.1",
+  "authors": [
+    "Brett Jones <bjones027@gmail.com>"
+  ],
+  "description": "blog",
+  "license": "MIT",
+  "private": true,
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "lib",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "angular-ui-router": "~0.2.13",
+    "angular": "~1.3.14",
+    "moment": "~2.9.0",
+    "font-awesome": "~4.3.0"
+  }
+}

@@ -1,0 +1,22 @@
+{
+    "env": {
+        "browser": true,
+            "node": true
+    },
+    "globals": {
+        "angular": true
+    },
+    "rules": {
+        "no-use-before-define": "nofunc",
+        "strict": true,
+        "eol-last": false,
+        "no-underscore-dangle": false,
+        "quotes": [1, "double", "avoid-escape"],
+        "no-space-before-semi": false,
+        "no-wrap-func": [1],
+        "no-comma-dangle": [0],
+        "indent": [1, 4],
+        "no-mixed-spaces-and-tabs": [2],
+        "no-unused-vars": [1],
+    }
+}

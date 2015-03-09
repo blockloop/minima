@@ -5,9 +5,7 @@ module.exports = function(router) {
 
     // create a post (accessed at POST http://localhost:8080/posts)
     .post(function(req, res) {
-
-        var post = new Post(req.body); // create a new instance of the Post model
-        // post.name = req.body.name;  // set the posts name (comes from the request)
+        var post = new Post(req.body);
 
         post.save(function(err) {
             if (err) { res.send(err); }
@@ -39,17 +37,32 @@ module.exports = function(router) {
     // ----------------------------------------------------
     router.route("/posts/:slug")
 
-    // get the post with that id
+    // GET /posts/:slug
     .get(function(req, res) {
         Post.findBySlug(req.params.slug, function(err, post) {
             if (err) { res.send(err); }
             res.json(post);
         });
+    });
+
+
+
+    // ----------------------------------------------------
+    // on routes that end in /posts/:slug
+    // ----------------------------------------------------
+    router.route("/posts/:id")
+
+    // DELETE /posts/:id
+    .delete(function(req, res) {
+        Post.findByIdAndRemove(req.params.id, function(err) {
+            if (err) { res.send(err); }
+            res.json({ message: "ok" }, 202);
+        });
     })
 
-    // update the post with this id
+    // PUT /posts/:id
     .put(function(req, res) {
-        Post.findById(req.params._id, function(err, post) {
+        Post.findById(req.params.id, function(err, post) {
 
             if (err) {
                 res.send(err);
@@ -67,15 +80,4 @@ module.exports = function(router) {
         });
     });
 
-    // on routes that end in /posts/:slug
-    // ----------------------------------------------------
-    router.route("/posts/:id")
-
-    // delete the post with this id
-    .delete(function(req, res) {
-        Post.findByIdAndRemove(req.params.id, function(err) {
-            if (err) { res.send(err); }
-            res.json({ message: "ok" }, 202);
-        });
-    });
 };
