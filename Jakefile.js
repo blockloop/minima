@@ -29,6 +29,7 @@ var inputJsFiles = fileList(["web/src/app.js", "web/src/**/*.js"]);
 var inputLibJsFiles = fileList([
     "web/lib/angular/angular.js",
     "web/lib/angular-ui-router/release/angular-ui-router.js",
+    "web/lib/angular-sanitize/angular-sanitize.min.js",
     "web/lib/moment/moment.js"
 ]);
 
