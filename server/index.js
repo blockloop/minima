@@ -25,6 +25,13 @@ console.log("Running statics from " + STATIC_PATH);
 mongoose.connect("mongodb://localhost:27017");
 var router = require("./routes");
 
+// DEV
+if (process.env.NODE_ENV !== "production") {
+    require("express-livereload")(app, {
+        watchDir: STATIC_PATH
+    });
+}
+
 // REGISTER ROUTES
 // =============================================================================
 app.use("/api", router);

@@ -1,4 +1,4 @@
-/* global rule, complete, desc, file, task, fail */
+/* global complete, desc, file, task, fail */
 
 var jake = require("jake");
 var chalk = require("chalk");
@@ -50,7 +50,8 @@ var outputLibJsFiles = outputFile("lib.js");
 var inputCssFiles = fileList(["web/src/app.less", "web/src/**/*.less"]);
 
 var inputLibCssFiles = fileList([
-    "web/lib/font-awesome/css/font-awesome.min.css"
+    "web/lib/font-awesome/css/font-awesome.min.css",
+    "web/lib/pure/pure-min.css"
 ]);
 
 var outputCssFiles = inputCssFiles.map(function(source) {

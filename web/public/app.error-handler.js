@@ -19,8 +19,7 @@ function extendExceptionHandler($delegate) {
         /**
          * Could add the error to a service's collection,
          * add errors to $rootScope, log errors to remote web server,
-         * or log locally. Or throw hard. It is entirely up to you.
-         * throw exception;
+         * or log locally. Or throw hard.
          */
         console.error(exception.msg, errorData);
     };

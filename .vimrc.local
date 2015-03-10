@@ -1,1 +1,1 @@
-set wildignore+=web/public/,web/lib
+set wildignore+=public,lib

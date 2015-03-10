@@ -15,12 +15,6 @@ function config($stateProvider, $urlRouterProvider) {
         controller: "HomeController as vm"
     });
 
-    $stateProvider.state("search", {
-        url: "/search",
-        templateUrl: "/search.html",
-        controller: "SearchController as vm"
-    });
-
     $stateProvider.state("admin", {
         url: "/admin",
         views: {
