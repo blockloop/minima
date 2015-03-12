@@ -1,7 +1,7 @@
 angular.module("app", [
+    "ngSanitize",
     "ui.router",
     "app.services",
-    "ngSanitize"
 ]);
 
 angular.module("app.services", []);

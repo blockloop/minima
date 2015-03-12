@@ -41,16 +41,9 @@ module.exports = function(router) {
     .get(function(req, res) {
         Post.findBySlug(req.params.slug, function(err, post) {
             if (err) { res.send(err); }
-            res.json(post);
+            res.json((post || [])[0]);
         });
-    });
-
-
-
-    // ----------------------------------------------------
-    // on routes that end in /posts/:slug
-    // ----------------------------------------------------
-    router.route("/posts/:id")
+    })
 
     // DELETE /posts/:id
     .delete(function(req, res) {

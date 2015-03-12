@@ -15,6 +15,18 @@ function config($stateProvider, $urlRouterProvider) {
         controller: "HomeController as vm"
     });
 
+    $stateProvider.state("post", {
+        url: "/:slug",
+        templateUrl: "/post.html",
+        controller: "PostController as vm",
+        resolve: {
+            /*@ngInject*/
+            post: function(Posts, $stateParams) {
+                return Posts.getBySlug($stateParams.slug);
+            }
+        }
+    });
+
     $stateProvider.state("admin", {
         url: "/admin",
         views: {

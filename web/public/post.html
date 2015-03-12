@@ -1,0 +1,8 @@
+<div class="post">
+  <div class="header">
+    <h1 class="title">{{::vm.post.title}}</h1>
+    <h3 class="createDate">{{::vm.post.createDate | date : 'mediumDate'}}</h3>
+  </div>
+
+  <div class="content" ng-bind-html="vm.post.content"></div>
+</div>
