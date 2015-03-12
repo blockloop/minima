@@ -3,12 +3,6 @@ angular
     .config(config);
 
 function config($stateProvider, $urlRouterProvider) {
-    $stateProvider.state("login", {
-        url: "/login",
-        templateUrl: "/login.html",
-        controller: "LoginController as vm"
-    });
-
     $stateProvider.state("home", {
         url: "/",
         templateUrl: "/home.html",
@@ -34,10 +28,14 @@ function config($stateProvider, $urlRouterProvider) {
                 templateUrl: "/admin.html",
                 controller: "AdminController as vm"
             },
-            "settings@call": {
+            "settings@admin": {
                 templateUrl: "/settings.html",
                 controller: "SettingsController as vm"
             },
+            "login@admin": {
+                templateUrl: "/login.html",
+                controller: "LoginController as vm"
+            }
         }
     });
 
