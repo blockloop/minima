@@ -48,9 +48,14 @@ var outputLibJsFiles = outputFile("lib.js");
 /** /SCRIPTS */
 
 /** STYLES */
-var inputCssFiles = fileList(["web/src/app.less", "web/src/**/*.less"]);
+var inputCssFiles = fileList([
+    "web/src/app.less",
+    "web/src/**/*.less"
+]);
 
 var inputLibCssFiles = fileList([
+    "web/src/assets/poole.min.css",
+    "web/src/assets/lanyon.min.css",
     "web/lib/font-awesome/css/font-awesome.min.css",
     "web/lib/pure/pure-min.css"
 ]);
