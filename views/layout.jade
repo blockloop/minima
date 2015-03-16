@@ -1,0 +1,42 @@
+html(lang='en')
+  head
+    meta(charset='utf-8')
+    meta(name='viewport', content='width=device-width, initial-scale=1.0')
+    base(href='/')
+    // <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
+    // <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
+    link(rel="stylesheet", href="/poole.min.css", type="style/css")
+    link(rel="stylesheet", href="/lanyon.min.css", type="style/css")
+    title Minima
+  body.home-template
+    input#sidebar-checkbox.sidebar-checkbox(type='checkbox')
+    #sidebar.sidebar
+      .sidebar-item
+        p Things I dwell on
+      nav.sidebar-nav
+        a.sidebar-nav-item(href='/') Home
+      .sidebar-item
+        p © 2015. All rights reserved.
+    .wrap
+      .masthead
+        .container
+          h3.masthead-title
+            a(href='/', title='Home') BrettJ.me
+            small Things I dwell on
+      .container.content
+          block content
+      nav.pagination(role='navigation')
+        span.page-number Page 1 of 1
+    label.sidebar-toggle(for='sidebar-checkbox')
+    script.
+      (function() {
+          var toggle = document.querySelector('.sidebar-toggle');
+          var sidebar = document.querySelector('#sidebar');
+          var checkbox = document.querySelector('#sidebar-checkbox');
+          document.addEventListener('click', function(e) {
+          var target = e.target;
+          if(!checkbox.checked || sidebar.contains(target) ||
+          (target === checkbox || target === toggle)) return;
+          checkbox.checked = false;
+          }, false);
+      })();

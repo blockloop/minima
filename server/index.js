@@ -9,7 +9,7 @@ var path = require("path");
 var mongoose = require("mongoose");
 
 // VARS
-var STATIC_PATH = path.join(__dirname, "../web/public");
+var STATIC_PATH = path.join(__dirname, "../views/assets/");
 var port = process.env.PORT || 4000;
 
 // configure app
@@ -18,12 +18,16 @@ app.use(morgan("dev")); // log requests to the console
 // configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(bodyParser.json());
-app.use(express.static(STATIC_PATH));
-console.log("Running statics from " + STATIC_PATH);
+app.set("view engine", "jade");
+
+// set locals
+app.locals.moment = require("moment");
 
 // setup db
 mongoose.connect("mongodb://localhost:27017");
 var router = require("./routes");
+app.use(express.static(STATIC_PATH));
+
 
 // DEV
 if (process.env.NODE_ENV !== "production") {
@@ -34,7 +38,7 @@ if (process.env.NODE_ENV !== "production") {
 
 // REGISTER ROUTES
 // =============================================================================
-app.use("/api", router);
+app.use("/", router);
 
 // START THE SERVER
 // =============================================================================
