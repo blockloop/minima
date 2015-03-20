@@ -1,6 +1,8 @@
 var Post = require("../models/post");
+var moment = require("moment");
 
 module.exports = function(router) {
+    // route to show list of posts showing newest first
     router.route("/").get(function(req, res){
         Post.find(function(err, posts) {
             if (err) {
@@ -13,6 +15,7 @@ module.exports = function(router) {
                             .replace(/\s+/g, " ");
                         post.summary = raw.substr(0, 200);
                     }
+                    post.prettyDate = moment(post.createDate).format("MMMM D, YYYY");
                     return post;
                 });
                 res.render("posts", { posts: postsWithSummaries });
@@ -20,10 +23,13 @@ module.exports = function(router) {
         });
     });
 
+    // route to show each individual post
     router.route(/[a-z-]+/).get(function(req, res, next) {
         var slug = req.path.replace("/", "");
         Post.findBySlug(slug, function(err, post) {
             post = (post || [])[0];
+            post.prettyDate = moment(post.createDate).format("MMMM D, YYYY");
+
             if (!post) {
                 next();
             } else if (err) {

@@ -1,15 +1,14 @@
 extends layout
 block content
-    each post in posts
-        article.post
-          header.post-header
-            h1.post-title
-              a(href='/' + post.slug)!= post.title
-            section.post-meta
-              time.post-date(datetime=moment(post.createDate).format("MMMM D, YYYY"))
-                != moment(post.createDate).format("MMMM D, YYYY")
-              a(href='/author/' + post.author)!= post.author
-          section.post-excerpt
-            p!= post.summary
-              | ...
-              a.read-more(href='/' + post.slug) »
+  each post in posts
+    article.post
+      header.post-header
+        h1.post-title
+          a(href='/' + post.slug)!= post.title
+        section.post-meta
+          time.post-date(datetime=post.prettyDate)!= post.prettyDate
+          a(href='/author/' + post.author)!= post.author
+      section.post-excerpt
+        p!= post.summary
+          | ...
+          a.read-more(href='/' + post.slug) »

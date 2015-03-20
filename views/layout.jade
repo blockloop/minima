@@ -5,8 +5,10 @@ html(lang='en')
     base(href='/')
     // <meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0;"/>
     // <meta name="description" content="A layout example with a side menu that hides on mobile, just like the Pure website.">
+    link(rel="stylesheet", href="http://fonts.googleapis.com/css?family=PT+Serif:400,400italic,700|PT+Sans:400")
     link(rel="stylesheet", href="/poole.min.css", type="style/css")
     link(rel="stylesheet", href="/lanyon.min.css", type="style/css")
+    link(rel="stylesheet", href="/app.css", type="style/css")
     title Minima
   body.home-template
     input#sidebar-checkbox.sidebar-checkbox(type='checkbox')
@@ -22,7 +24,7 @@ html(lang='en')
         .container
           h3.masthead-title
             a(href='/', title='Home') BrettJ.me
-            small Things I dwell on
+            small  Things I dwell on
       .container.content
           block content
       nav.pagination(role='navigation')

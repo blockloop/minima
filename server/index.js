@@ -9,8 +9,8 @@ var path = require("path");
 var mongoose = require("mongoose");
 
 // VARS
-var STATIC_PATH = path.join(__dirname, "../views/assets/");
-var port = process.env.PORT || 4000;
+var STATIC_PATH = path.join(__dirname, "../static/");
+var PORT = process.env.PORT || 4000;
 
 // configure app
 app.use(morgan("dev")); // log requests to the console
@@ -22,6 +22,7 @@ app.set("view engine", "jade");
 
 // set locals
 app.locals.moment = require("moment");
+app.locals.config = require("../app.config.js");
 
 // setup db
 mongoose.connect("mongodb://localhost:27017");
@@ -32,7 +33,7 @@ app.use(express.static(STATIC_PATH));
 // DEV
 if (process.env.NODE_ENV !== "production") {
     require("express-livereload")(app, {
-        watchDir: STATIC_PATH
+        watchDir: "../views"
     });
 }
 
@@ -42,5 +43,5 @@ app.use("/", router);
 
 // START THE SERVER
 // =============================================================================
-app.listen(port);
-console.log("Magic happens on port " + port);
+app.listen(PORT);
+console.log("Listening at http://localhost:" + PORT);

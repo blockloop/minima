@@ -1,20 +1,20 @@
 extends layout
 block content
-    article.post
-      header.post-header
-        h1.post-title!= post.title
-        section.post-meta
-            time.post-date!= moment(post.createDate).format("MMMM D, YYYY")
-      section.post-content!= post.content
-      footer.post-footer
-        section.author
-          h4
-            a(href='/author/brett/') Brett
-          p
-            | Read
-            a(href='/author/brett/') more posts
-            |  by this author.
-          .author-meta
-            span.author-location Dallas
-            span.author-link
-              a(href='http://brettj.me') http://brettj.me
+  article.post
+    header.post-header
+      h1.post-title!= post.title
+      section.post-meta
+        time.post-date!= post.prettyDate
+    section.post-content!= post.content
+    footer.post-footer
+      section.author
+        h4
+          a(href='/author/brett/') Brett
+        p
+          | Read
+          a(href='/author/brett/')  more posts
+          |  by this author.
+        .author-meta
+          span.author-location Dallas
+          span.author-link
+            a(href='http://brettj.me')  http://brettj.me
