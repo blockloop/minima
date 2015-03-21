@@ -4,4 +4,5 @@ module.exports = config = {
         name: "Brett Jones"
     },
     prettyDateFormat: "MMMM D, YYYY",
+    articleMiddleware: "../minima-evernote"
 };

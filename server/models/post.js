@@ -17,6 +17,10 @@ var PostSchema = new Schema({
         type: Date,
         default: Date.now
     },
+    modifiedDate: {
+        type: Date,
+        default: Date.now
+    },
     content: {
         type: String,
         required: true

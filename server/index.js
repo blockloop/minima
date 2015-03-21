@@ -7,12 +7,15 @@ var app = express();
 var morgan = require("morgan");
 var path = require("path");
 var mongoose = require("mongoose");
+var articleLoader = require("./article-loader");
+
 
 // VARS
 var STATIC_PATH = path.join(__dirname, "../static/");
 var PORT = process.env.PORT || 4000;
 
 // configure app
+app.use(articleLoader);
 app.use(morgan("dev")); // log requests to the console
 
 // configure body parser
@@ -40,6 +43,7 @@ if (process.env.NODE_ENV !== "production") {
 // REGISTER ROUTES
 // =============================================================================
 app.use("/", router);
+
 
 // START THE SERVER
 // =============================================================================
