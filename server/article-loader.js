@@ -2,7 +2,7 @@ var moment = require("moment");
 var Post = require("./models/post");
 var config = require("../app.config");
 var articleMiddleware = require(config.articleMiddleware);
-var Q = require("q");
+// var Q = require("q");
 
 var lastCheckDate = moment("1970-01-01");
 
@@ -52,9 +52,10 @@ function recieveArticle(remote) {
 }
 
 function persistArticle(article) {
-    var post = new Post(article);
-    var upsert = post.toObject();
     console.log("persisting '%s': %s", article.slug, upsert.title);
+    var post = new Post(article);
+    post.markModified("modifiedDate");
+    var upsert = post.toObject();
     delete upsert._id;
 
     Post.findOneAndUpdate({slug: article.slug}, upsert, {upsert: true}, function(err) {

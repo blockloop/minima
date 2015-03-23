@@ -1,3 +1,5 @@
+/* eslint new-cap: [0] */
+
 /**
  * https://dev.evernote.com/doc/reference/NoteStore.html#Struct_NoteFilter
  * https://dev.evernote.com/doc/reference/NoteStore.html#Fn_NoteStore_findNotesMetadata
@@ -14,6 +16,7 @@ var notebookName = "minima";
 var notebookGuid = null;
 var moment = require("moment");
 var markdown = require("markdown").markdown;
+var htmlToText = require("html-to-text");
 var Q = require("q");
 
 
@@ -75,15 +78,19 @@ function getPageContent(note) {
     var def = Q.defer();
     console.log("fetching note content for %s: '%s'", note.identifier, note.title);
     noteStore.getNote(note.identifier, true, true, true, true, function(err, found){
-        if (err) { return console.error(err); }
-        /*eslint-disable */
-        var html = enml.HTMLOfENML(found.content, found.resources);
-        /*eslint-enable */
-        note.content = html.match(/<body[^>]+>(.+)<\/body>/)[1];
-        if (note.tags.indexOf("markdown") !== -1) {
-            console.log("Converting %s to markdown", note.slug);
-            note.content.replace(/<[^>]>/, "");
-            note.content = markdown.toHTML(note.content);
+        var content;
+
+        if (err) {
+            console.error(err);
+            def.reject(err);
+        } else if (note.tags.indexOf("markdown") === -1) {
+            content = enml.HTMLOfENML(found.content, found.resources);
+            note.content = content.match(/<body[^>]+>(.+)<\/body>/)[1];
+        } else {
+            console.log("converting %s to markdown", note.slug);
+            content = enml.HTMLOfENML(found.content, found.resources);
+            var plain = htmlToText.fromString(content, { wordwrap: false });
+            note.content = markdown.toHTML(plain, "Maruku");
         }
         def.resolve(note);
     });
