@@ -55,6 +55,10 @@ function getNotebookId() {
     return def.promise;
 }
 
+/**
+ * @access public
+ * @callback cb - called with each note received
+ */
 function listPages(cb) {
     getNotebookId().then(go);
 
@@ -68,12 +72,15 @@ function listPages(cb) {
                 createDate: moment.utc(note.created).toDate(),
                 modifiedDate: moment.utc(note.updated).toDate(),
                 tags: note.tags || [],
-                resources: note.resources
             });
         });
     }
 }
 
+/**
+ * @param {Note} - a note to fetch content for
+ * @returns {promise}
+ */
 function getPageContent(note) {
     var def = Q.defer();
     console.log("fetching note content for %s: '%s'", note.identifier, note.title);
@@ -99,6 +106,14 @@ function getPageContent(note) {
 }
 
 
+
+/**
+ * getNotes
+ *
+ * @access private
+ * @param {String} notebookId - notebook guid to lookup
+ * @callback cb - called with each note received
+ */
 function getNotes(notebookId, cb) {
     var filter = new Evernote.NoteFilter();
     //set the notebook guid filter to the GUID of the default notebook
@@ -129,6 +144,13 @@ function getNotes(notebookId, cb) {
         }});
 }
 
+/**
+ * getNoteTags
+ *
+ * @access private
+ * @param {Note} note - A note to get tags for
+ * @return {promise}
+ */
 function getNoteTags(note) {
     var def = Q.defer();
     console.log("Getting tags for %s", note.title);
