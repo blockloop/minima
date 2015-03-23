@@ -20,9 +20,9 @@ var htmlToText = require("html-to-text");
 var Q = require("q");
 
 
-module.exports = {
-    listPages: listPages,
-    getPageContent: getPageContent
+module.exports = function() {
+    this.listPages = listPages;
+    this.getPageContent = getPageContent;
 };
 
 

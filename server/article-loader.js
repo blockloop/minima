@@ -1,16 +1,17 @@
 var moment = require("moment");
 var Post = require("./models/post");
 var config = require("../app.config");
-var articleMiddleware = require(config.articleMiddleware);
-// var Q = require("q");
-
+var MiddlewareLoader = require(config.articleMiddleware);
+var articleMiddleware = new MiddlewareLoader();
 var lastCheckDate = moment("1970-01-01");
 
-module.exports = function(req, res, next) {
-    if (!req.url.match(/.(css|js)$/)) {
-        setTimeout(checkForRefresh);
-    }
-    next();
+module.exports = function() {
+    this.loader = function(req, res, next) {
+        next();
+        if (!req.url.match(/.(css|js)$/)) {
+            setTimeout(checkForRefresh);
+        }
+    };
 };
 
 checkForRefresh();
@@ -19,7 +20,8 @@ function checkForRefresh() {
     var diff = moment().diff(lastCheckDate, "minutes", true);
 
     if (diff > 10) {
-        console.log("Doing refresh...");
+        console.log("It's been %s minutes since the last refresh. Doing refresh...", diff);
+        lastCheckDate = Date.now();
         refresh();
     } else {
         console.log("Next refresh in %s minutes", (10 - diff));

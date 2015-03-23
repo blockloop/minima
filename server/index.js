@@ -7,7 +7,8 @@ var app = express();
 var morgan = require("morgan");
 var path = require("path");
 var mongoose = require("mongoose");
-var articleLoader = require("./article-loader");
+var ArticleLoader = require("./article-loader");
+var articleLoader = new ArticleLoader();
 
 
 // VARS
@@ -15,7 +16,7 @@ var STATIC_PATH = path.join(__dirname, "../static/");
 var PORT = process.env.PORT || 4000;
 
 // configure app
-app.use(articleLoader);
+app.use(articleLoader.loader);
 app.use(morgan("dev")); // log requests to the console
 
 // configure body parser
