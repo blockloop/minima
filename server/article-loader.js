@@ -39,9 +39,8 @@ function recieveArticle(remote) {
             remote = extend(local, remote);
 
             articleMiddleware.getPageContent(remote)
-            .then(function then(articleWithContent){
-                persistArticle(articleWithContent);
-            });
+            .then(persistArticle, handleErr)
+            .catch(handleErr);
 
         } else {
             console.log("REMOTE %s: %s", remote.slug, moment(remote.modifiedDate).toDate());
@@ -52,10 +51,10 @@ function recieveArticle(remote) {
 }
 
 function persistArticle(article) {
-    console.log("persisting '%s': %s", article.slug, upsert.title);
     var post = new Post(article);
     post.markModified("modifiedDate");
     var upsert = post.toObject();
+    console.log("persisting '%s': %s", article.slug, upsert.title);
     delete upsert._id;
 
     Post.findOneAndUpdate({slug: article.slug}, upsert, {upsert: true}, function(err) {
@@ -74,4 +73,8 @@ function extend(left, right) {
         }
     }
     return left;
+}
+
+function handleErr(err) {
+    throw err;
 }

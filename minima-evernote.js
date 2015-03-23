@@ -92,6 +92,7 @@ function getPageContent(note) {
             var plain = htmlToText.fromString(content, { wordwrap: false });
             note.content = markdown.toHTML(plain, "Maruku");
         }
+        console.log("note content for %s received", note.title);
         def.resolve(note);
     });
     return def.promise;
@@ -103,10 +104,8 @@ function getNotes(notebookId, cb) {
     //set the notebook guid filter to the GUID of the default notebook
     filter.notebookGuid = notebookId;
 
-
     //create a new result spec for findNotesMetadata
     var resultSpec = new Evernote.NotesMetadataResultSpec();
-    //set the result spec to include titles
     resultSpec.includeTitle = true;
     resultSpec.includeContentLength = true;
     resultSpec.includeCreated = true;
@@ -133,6 +132,13 @@ function getNotes(notebookId, cb) {
 function getNoteTags(note) {
     var def = Q.defer();
     console.log("Getting tags for %s", note.title);
+
+    if (!note.tagGuids || note.tagGuids.length <= 0) {
+        console.log("no tags for %s", note.title);
+        def.resolve([]);
+        return def.promise;
+    }
+
     var all = note.tagGuids.map(function(tagGuid) {
         return getTag(tagGuid);
     });
