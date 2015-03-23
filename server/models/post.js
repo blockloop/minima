@@ -1,7 +1,12 @@
 var mongoose = require("mongoose");
 var Schema = mongoose.Schema;
+var uuid = require("node-uuid");
 
 var PostSchema = new Schema({
+    identifier: {
+        type: String,
+        default: uuid
+    },
     title: {
         type: String,
         required: true,

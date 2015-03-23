@@ -1,9 +1,10 @@
 var moment = require("moment");
-var Post = require("../models/post");
+var Post = require("./models/post");
 var config = require("../app.config");
 var articleMiddleware = require(config.articleMiddleware);
+var Q = require("q");
 
-var lastCheckDate = moment();
+var lastCheckDate = moment("1970-01-01");
 
 module.exports = function(req, res, next) {
     if (!req.url.match(/.(css|js)$/)) {
@@ -29,27 +30,38 @@ function refresh() {
     articleMiddleware.listPages(recieveArticle);
 }
 
-function recieveArticle(article) {
-    Post.findBySlug(article.slug, function(err, found) {
-        if (err) {
-            console.error(err);
-        } else if (found.length === 1) {
-            var updated = extend(found, article);
-            persistArticle(updated);
+function recieveArticle(remote) {
+    Post.findBySlug(remote.slug, function(err, locals) {
+        if (err) { return console.error(err); }
+        var local = locals[0] || {};
+
+        if (!local.modifiedDate || remote.modifiedDate > local.modifiedDate) {
+            remote = extend(local, remote);
+
+            articleMiddleware.getPageContent(remote)
+            .then(function then(articleWithContent){
+                persistArticle(articleWithContent);
+            });
+
         } else {
-            persistArticle(article);
+            console.log("REMOTE %s: %s", remote.slug, moment(remote.modifiedDate).toDate());
+            console.log("LOCAL %s: %s", local.slug, local.modifiedDate);
+            console.log("%s is already the latest version", remote.slug);
         }
     });
 }
 
 function persistArticle(article) {
     var post = new Post(article);
+    var upsert = post.toObject();
+    console.log("persisting '%s': %s", article.slug, upsert.title);
+    delete upsert._id;
 
-    post.save(function(err) {
+    Post.findOneAndUpdate({slug: article.slug}, upsert, {upsert: true}, function(err) {
         if (err) {
             console.error(err);
         } else {
-            console.log("new post saved. Title: %s", post.title);
+            console.log("post saved. Title: %s", upsert.title);
         }
     });
 }

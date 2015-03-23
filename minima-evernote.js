@@ -10,52 +10,84 @@ var authToken = "***REMOVED***";
 var client = new Evernote.Client({token: authToken, sandbox: true});
 // var userStore = client.getUserStore();
 var noteStore = client.getNoteStore();
+var notebookName = "minima";
 var notebookGuid = null;
+var moment = require("moment");
+var markdown = require("markdown").markdown;
+var Q = require("q");
 
 
 module.exports = {
     listPages: listPages,
-    getContent: getContent
+    getPageContent: getPageContent
 };
 
 
-noteStore.listNotebooks(function (err, notebooks){
-    if (err) { return console.error(err); }
-    var found = notebooks.filter(function(item){
-        return item.name.toLowerCase() === "minima";
-    });
-
-    if (found && found.length === 1) {
-        notebookGuid = found[0].guid;
-    } else {
-        notebookGuid = null;
+/**
+ * @returns {promise}
+ */
+function getNotebookId() {
+    var def = Q.defer();
+    if (notebookGuid) {
+        def.resolve(notebookGuid);
+        return def.promise;
     }
-});
 
-function listPages(cb) {
-    getNotes(notebookGuid, function(notes) {
-        notes.map(function(note) {
-            return {
-                id: note.guid,
-                title: note.title,
-                slug: slug(note.title.toLowerCase()),
-                createDate: note.created,
-                modifiedDate: note.updated,
-                tags: note.tagGuids || [],
-                resources: note.resources
-            };
-        }).forEach(cb);
+    console.log("Fetching notebook ID for %s", notebookName);
+    noteStore.listNotebooks(function (err, notebooks){
+        if (err) { return console.error(err); }
+        var found = notebooks.filter(function(item){
+            return item.name.toLowerCase() === notebookName;
+        });
+
+        if (found && found.length === 1) {
+            console.log("found notebook ID %s for %s", found[0].guid, notebookName);
+            notebookGuid = found[0].guid;
+            def.resolve(notebookGuid);
+        } else {
+            console.log("could not find notebook ID for %s", notebookName);
+            notebookGuid = null;
+        }
     });
+    return def.promise;
 }
 
-function getContent(note) {
-    noteStore.getNote(note.guid, true, true, true, true, function(err, found){
+function listPages(cb) {
+    getNotebookId().then(go);
+
+    function go() {
+        console.log("getting notes for %s", notebookName);
+        getNotes(notebookGuid, function(note) {
+            cb({
+                identifier: note.guid,
+                title: note.title,
+                slug: slug(note.title.toLowerCase()),
+                createDate: moment.utc(note.created).toDate(),
+                modifiedDate: moment.utc(note.updated).toDate(),
+                tags: note.tags || [],
+                resources: note.resources
+            });
+        });
+    }
+}
+
+function getPageContent(note) {
+    var def = Q.defer();
+    console.log("fetching note content for %s: '%s'", note.identifier, note.title);
+    noteStore.getNote(note.identifier, true, true, true, true, function(err, found){
         if (err) { return console.error(err); }
         /*eslint-disable */
         var html = enml.HTMLOfENML(found.content, found.resources);
         /*eslint-enable */
-        console.log(html);
+        note.content = html.match(/<body[^>]+>(.+)<\/body>/)[1];
+        if (note.tags.indexOf("markdown") !== -1) {
+            console.log("Converting %s to markdown", note.slug);
+            note.content.replace(/<[^>]>/, "");
+            note.content = markdown.toHTML(note.content);
+        }
+        def.resolve(note);
     });
+    return def.promise;
 }
 
 
@@ -82,15 +114,42 @@ function getNotes(notebookId, cb) {
         else {
             //log the number of notes found in the default notebook
             console.log("Found %s notes", notesMeta.notes.length);
-            cb(notesMeta.notes);
-            // notesMeta.notes.forEach(function(note) {
-            //     note.tagGuids.forEach(function(tagGuid) {
-            //         noteStore.getTag(tagGuid);
-            //     });
-            // });
-            // for (var i in notesMeta.notes) {
-            //     //list the title of each note in the default notebook
-            //     console.log("%s: %s", i, notesMeta.notes[i].title);
-            // }
+            notesMeta.notes.forEach(function(note) {
+                getNoteTags(note).then(function(tags) {
+                    note.tags = tags;
+                    cb(note);
+                });
+            });
         }});
+}
+
+function getNoteTags(note) {
+    var def = Q.defer();
+    console.log("Getting tags for %s", note.title);
+    var all = note.tagGuids.map(function(tagGuid) {
+        return getTag(tagGuid);
+    });
+
+    Q.allSettled(all).spread(function() {
+        var tags = Array.prototype.slice.call(arguments).map(function(promise) {
+            return promise.value;
+        });
+        console.log("TAGS for %s: %s", note.title, tags);
+        def.resolve(tags);
+    }).done();
+
+    return def.promise;
+}
+
+function getTag(tagGuid) {
+    var def = Q.defer();
+    console.log("Getting tag for %s", tagGuid);
+    noteStore.getTag(tagGuid, function(err, tag) {
+        if (err) {
+            console.error(err);
+            def.reject(err);
+        }
+        def.resolve(tag.name);
+    });
+    return def.promise;
 }

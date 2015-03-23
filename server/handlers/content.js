@@ -28,7 +28,6 @@ module.exports = function(router) {
         var slug = req.path.replace("/", "");
         Post.findBySlug(slug, function(err, post) {
             post = (post || [])[0];
-            post.prettyDate = moment(post.createDate).format("MMMM D, YYYY");
 
             if (!post) {
                 next();
