@@ -1,1 +1,1 @@
-set wildignore+=public,lib
+set wildignore+=public,lib,logs
