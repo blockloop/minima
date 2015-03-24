@@ -3,23 +3,21 @@ var moment = require("moment");
 
 module.exports = function(router) {
     // route to show list of posts showing newest first
-    router.route("/").get(function(req, res){
-        Post.find(function(err, posts) {
-            if (err) {
-                res.send(err);
-            } else {
-                var postsWithSummaries = posts.map(function(post){
-                    if (!post.summary) {
-                        var raw = post.content
-                            .replace(/<[^>]+>/g, "")
-                            .replace(/\s+/g, " ");
-                        post.summary = raw.substr(0, 200);
-                    }
-                    post.prettyDate = moment(post.createDate).format("MMMM D, YYYY");
-                    return post;
-                });
-                res.render("posts", { posts: postsWithSummaries });
-            }
+    router.route("/").get(function(req, res, next){
+        Post.find().sort({createDate: "desc"}).exec(function(err, posts) {
+            if (err) { return next(err); }
+
+            var postsWithSummaries = posts.map(function(post){
+                if (!post.summary) {
+                    var raw = post.content
+                        .replace(/<[^>]+>/g, "")
+                        .replace(/\s+/g, " ");
+                    post.summary = raw.substr(0, 200);
+                }
+                post.prettyDate = moment(post.createDate).format("MMMM D, YYYY");
+                return post;
+            });
+            res.render("posts", { posts: postsWithSummaries });
         });
     });
 
@@ -29,11 +27,13 @@ module.exports = function(router) {
         Post.findBySlug(slug, function(err, post) {
             post = (post || [])[0];
 
-            if (!post) {
+            if (err) {
+                next(err);
+            } else if (!post) {
                 next();
-            } else if (err) {
-                res.send(err);
             } else {
+                post = post.toObject();
+                post.prettyDate = moment(post.createDate).format("MMMM D, YYYY");
                 res.render("post", { post: post });
             }
         });
