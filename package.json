@@ -1,0 +1,46 @@
+{
+  "name": "minima",
+  "version": "0.0.1",
+  "description": "A blog engine where you can do what you want",
+  "main": "server/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "body-parser": "^1.0.2",
+    "chance": "^0.7.3",
+    "express": "^4.12.2",
+    "express-livereload": "^0.0.24",
+    "glob": "^5.0.1",
+    "jasmine-node-karma": "^1.6.1",
+    "log4js": "^0.6.22",
+    "minima-evernote-loader": "git+ssh://git@bitbucket.org/brettof86/minima-evernote-loader.git",
+    "moment": "^2.9.0",
+    "mongoose": "^3.6.20",
+    "morgan": "^1.0.1",
+    "node-uuid": "^1.4.3",
+    "phantomjs": "^1.9.16",
+    "q": "^1.2.0",
+    "slug": "^0.8.0",
+    "sprintf-js": "^1.0.2"
+  },
+  "devDependencies": {
+    "mocha": "^2.2.0"
+  },
+  "scripts": {
+    "test": "jasmine-node-karma test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@bitbucket.org:brettof86/minima.git"
+  },
+  "keywords": [
+    "blog",
+    "evernote",
+    "dropbox",
+    "google",
+    "docs"
+  ],
+  "author": "Brett Jones <b4ae41e6@opayq.com>",
+  "license": "MIT"
+}

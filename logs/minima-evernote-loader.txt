@@ -1,0 +1,30 @@
+[2015-03-23 21:31:07.191] [INFO] minima-evernote-loader - Fetching notebook ID for minima
+[2015-03-23 21:31:07.869] [INFO] minima-evernote-loader - found notebook ID 27237112-6bde-4d30-a45d-7e010872b829 for minima
+[2015-03-23 21:31:07.870] [INFO] minima-evernote-loader - getting notes for minima
+[2015-03-23 21:31:08.256] [INFO] minima-evernote-loader - Found 2 notes
+[2015-03-23 21:31:08.257] [INFO] minima-evernote-loader - Getting tags for Test Post
+[2015-03-23 21:31:08.258] [INFO] minima-evernote-loader - Getting tag for a7a79309-30f8-432c-985e-b9b85734ca2d
+[2015-03-23 21:31:08.260] [INFO] minima-evernote-loader - Getting tag for 9205f1f3-3b0b-4348-ae14-3186aefeb5ab
+[2015-03-23 21:31:08.263] [INFO] minima-evernote-loader - Getting tags for Over, Underneath, and In-Between
+[2015-03-23 21:31:08.264] [INFO] minima-evernote-loader - no tags for Over, Underneath, and In-Between
+[2015-03-23 21:31:08.565] [INFO] minima-evernote-loader - TAGS for Test Post: publish,test
+[2015-03-23 21:32:04.303] [INFO] minima-evernote-loader - Fetching notebook ID for minima
+[2015-03-23 21:32:04.977] [INFO] minima-evernote-loader - found notebook ID 27237112-6bde-4d30-a45d-7e010872b829 for minima
+[2015-03-23 21:32:04.978] [INFO] minima-evernote-loader - getting notes for minima
+[2015-03-23 21:32:05.265] [INFO] minima-evernote-loader - Found 2 notes
+[2015-03-23 21:32:05.266] [INFO] minima-evernote-loader - Getting tags for Test Post
+[2015-03-23 21:32:05.266] [INFO] minima-evernote-loader - Getting tag for a7a79309-30f8-432c-985e-b9b85734ca2d
+[2015-03-23 21:32:05.268] [INFO] minima-evernote-loader - Getting tag for 9205f1f3-3b0b-4348-ae14-3186aefeb5ab
+[2015-03-23 21:32:05.271] [INFO] minima-evernote-loader - Getting tags for Over, Underneath, and In-Between
+[2015-03-23 21:32:05.271] [INFO] minima-evernote-loader - no tags for Over, Underneath, and In-Between
+[2015-03-23 21:32:05.556] [INFO] minima-evernote-loader - TAGS for Test Post: publish,test
+[2015-03-23 21:32:19.070] [INFO] minima-evernote-loader - Fetching notebook ID for minima
+[2015-03-23 21:32:19.761] [INFO] minima-evernote-loader - found notebook ID 27237112-6bde-4d30-a45d-7e010872b829 for minima
+[2015-03-23 21:32:19.763] [INFO] minima-evernote-loader - getting notes for minima
+[2015-03-23 21:32:20.060] [INFO] minima-evernote-loader - Found 2 notes
+[2015-03-23 21:32:20.062] [INFO] minima-evernote-loader - Getting tags for Test Post
+[2015-03-23 21:32:20.063] [INFO] minima-evernote-loader - Getting tag for a7a79309-30f8-432c-985e-b9b85734ca2d
+[2015-03-23 21:32:20.065] [INFO] minima-evernote-loader - Getting tag for 9205f1f3-3b0b-4348-ae14-3186aefeb5ab
+[2015-03-23 21:32:20.067] [INFO] minima-evernote-loader - Getting tags for Over, Underneath, and In-Between
+[2015-03-23 21:32:20.067] [INFO] minima-evernote-loader - no tags for Over, Underneath, and In-Between
+[2015-03-23 21:32:20.359] [INFO] minima-evernote-loader - TAGS for Test Post: publish,test

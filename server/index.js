@@ -26,10 +26,10 @@ app.set("view engine", "jade");
 
 // set locals
 app.locals.moment = require("moment");
-app.locals.config = require("../app.config.js");
+app.locals.config = require("../app.config");
 
 // setup db
-mongoose.connect("mongodb://localhost:27017");
+mongoose.connect("mongodb://localhost:27017/minima");
 var router = require("./routes");
 app.use(express.static(STATIC_PATH));
 
