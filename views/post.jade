@@ -4,7 +4,7 @@ block content
     header.post-header
       h1.post-title!= post.title
       section.post-meta
-        time.post-date!= post.prettyDate
+        time.post-date(datetime=post.prettyDate)!= post.prettyDate
     section.post-content!= post.content
     footer.post-footer
       section.author
