@@ -16,11 +16,20 @@ var sprintf = require("sprintf-js").sprintf;
 var STATIC_PATH = path.join(__dirname, "../static/");
 var HOSTNAME = process.env.HOSTNAME || "localhost";
 var PORT = process.env.PORT || 4000;
-var PRODUCTION = process.env.NODE_ENV === "production";
+var isProd = process.env.NODE_ENV === "production";
 
 // configure app
 app.use(articleLoader.loader);
-app.use(morgan("dev")); // log requests to the console
+
+app.use(morgan({
+    format: isProd ? "tiny" : "dev",
+    skip: function (req, res) {
+        return isProd && res.statusCode < 400;
+    },
+    stream: {
+        write: isProd ? logger.error : logger.info
+    }
+})); // log requests to the console
 
 // configure body parser
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -34,7 +43,9 @@ app.locals.config = require("../app.config");
 // setup db
 mongoose.connect("mongodb://localhost:27017/minima");
 var router = require("./routes");
-app.use(express.static(STATIC_PATH));
+app.use(express.static(STATIC_PATH, {
+    maxAge: isProd ? 1000 * 60 * 60 : 0 // 60 mins
+}));
 
 
 // DEV
@@ -57,7 +68,7 @@ app.use(function(err, req, res, next) {
         logger.error(msg);
         res.status(500);
 
-        if (PRODUCTION) {
+        if (isProd) {
             // TODO create a pretty error page
             res.end("500: An error occured");
         } else {

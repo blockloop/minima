@@ -20,11 +20,14 @@ log4js.configure({
 log4js.replaceConsole();
 
 var logger = log4js.getLogger("minima");
+var middlewareLogger = log4js.getLogger(config.articleMiddleware);
 
 if (process.env.NODE_ENV === "production") {
     logger.setLevel("WARN");
+    middlewareLogger.setLevel("WARN");
 } else {
     logger.setLevel("TRACE");
+    middlewareLogger.setLevel("TRACE");
 }
 
 module.exports = {
@@ -52,8 +55,12 @@ module.exports = {
 function log(level, args) {
     var params = args ? Array.prototype.slice.call(args) : [];
 
-    if (params.length > 1 && (typeof params[1] === "string" || params[1] instanceof String)) {
-        logger[level](sprintf.apply(null, args));
+    if (typeof params[0] === "string" || params[0] instanceof String) {
+        if (params.length > 1) {
+            logger[level](sprintf.apply(null, args));
+        } else {
+            logger[level](params[0]);
+        }
     } else {
         logger[level](JSON.stringify(params, true))
     }
