@@ -1,3 +1,5 @@
+"use strict";
+
 var moment = require("moment");
 var Post = require("./models/post");
 var config = require("../app.config");
@@ -15,17 +17,15 @@ module.exports = function() {
     };
 };
 
-checkForRefresh();
+// checkForRefresh();
 
 function checkForRefresh() {
-    var diff = moment().diff(lastCheckDate, "minutes", true);
+    var minsSinceLastRun = moment().diff(lastCheckDate, "minutes", true);
 
-    if (diff > 10) {
-        logger.info("It's been %s minutes since the last refresh. Doing refresh...", diff);
+    if (minsSinceLastRun >= 10) {
+        logger.info("Last refresh was %s. Refreshing...", moment(lastCheckDate).fromNow());
         lastCheckDate = Date.now();
         refresh();
-    } else {
-        logger.info("Next refresh in %s minutes", (10 - diff));
     }
 }
 

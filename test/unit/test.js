@@ -1,10 +1,12 @@
 /*eslint-env jasmine, mocha */
-var uuid = require("node-uuid");
-var Impl = require("../../minima-evernote.js");
-var Chance = require("chance");
-var chance = new Chance();
+"use strict";
 
 (function () {
+    var uuid = require("node-uuid");
+    var Impl = require("../../minima-evernote");
+    var Chance = require("chance");
+    var chance = new Chance();
+
     describe("article loader", function () {
         var instance = null;
 
@@ -31,15 +33,15 @@ var chance = new Chance();
 
     });
 
-})();
+    function mockNote() {
+        return {
+            identifier: uuid(),
+            title: chance.string(),
+            slug: chance.string(),
+            createDate: Date.now(),
+            modifiedDate: Date.now(),
+            tags: [],
+        };
+    }
 
-function mockNote() {
-    return {
-        identifier: uuid(),
-        title: chance.string(),
-        slug: chance.string(),
-        createDate: Date.now(),
-        modifiedDate: Date.now(),
-        tags: [],
-    };
-}
+})();
