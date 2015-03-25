@@ -4,50 +4,68 @@ var moment = require("moment");
 var Post = require("./models/post");
 var config = require("../app.config");
 var logger = require("./logger");
+var extend = require("extend");
+
 var ArticleSource = require(config.articleMiddleware);
-var articleSource = new ArticleSource(logger.getLogger(config.articleMiddleware));
+var middlewareLogger = logger.getLogger(config.articleMiddleware);
+var middlewareConfig = config[config.articleMiddleware];
+var articleSource = new ArticleSource(middlewareLogger, middlewareConfig);
+
 var lastCheckDate = moment("1970-01-01");
+var isBackground = config.refreshEveryMins > 0;
 
 module.exports = function() {
     this.loader = function(req, res, next) {
         next();
-        if (!req.url.match(/.(css|js)$/)) {
-            setTimeout(checkForRefresh);
+        if (!req.url.match(/.(css|js)$/) && !isBackground) {
+            checkForRefresh();
         }
     };
 };
 
-// checkForRefresh();
+refresh();
+
+if (isBackground) {
+    setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);
+}
 
 function checkForRefresh() {
     var minsSinceLastRun = moment().diff(lastCheckDate, "minutes", true);
 
-    if (minsSinceLastRun >= 10) {
+    if (minsSinceLastRun >= config.refreshEveryMins) {
         logger.info("Last refresh was %s. Refreshing...", moment(lastCheckDate).fromNow());
-        lastCheckDate = Date.now();
         refresh();
     }
 }
 
 function refresh() {
-    articleSource.listPages(recieveArticle);
+    lastCheckDate = Date.now();
+    try {
+        articleSource.listPages(receiveArticle);
+    } catch (e) {
+        logger.fatal(e);
+    }
 }
 
-function recieveArticle(remote) {
+function receiveArticle(remote) {
     Post.findBySlug(remote.slug, function(err, locals) {
         if (err) { return logger.fatal(err); }
-        var local = locals[0] || {};
 
-        if (!local.modifiedDate || remote.modifiedDate > local.modifiedDate) {
-            remote = extend(local, remote);
+        var local = locals[0];
+
+        if (remote.unpublished === true) {
+            if (local == null) { return null; }
+            logger.trace("unpublishing %s", remote.title);
+            removePost(local);
+        } else if (!local || remote.modifiedDate > local.modifiedDate) {
+            remote = extend(true, local || {}, remote);
 
             articleSource.getPageContent(remote)
-            .then(persistArticle, handleErr)
-            .catch(handleErr);
-
+                .then(persistArticle, logger.err)
+                .catch(logger.err);
         } else {
-            logger.info("REMOTE %s: %s", remote.slug, moment(remote.modifiedDate).toDate());
-            logger.info("LOCAL %s: %s", local.slug, local.modifiedDate);
+            logger.trace("REMOTE %s: %s", remote.slug, moment(remote.modifiedDate).toDate());
+            logger.trace("LOCAL %s: %s", local.slug, local.modifiedDate);
             logger.info("%s is already the latest version", remote.slug);
         }
     });
@@ -69,15 +87,12 @@ function persistArticle(article) {
     });
 }
 
-function extend(left, right) {
-    for (var key in right) {
-        if (right.hasOwnProperty(key)) {
-            left[key] = right[key];
+function removePost(post) {
+    Post.remove({ slug: post.slug }, function(err) {
+        if (err) {
+            logger.error("ERROR removing %s which was marked unpublished", post.title);
+        } else {
+            logger.trace("successfully unpublished %s", post.title);
         }
-    }
-    return left;
-}
-
-function handleErr(err) {
-    throw err;
+    });
 }

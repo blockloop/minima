@@ -14,6 +14,7 @@ var sprintf = require("sprintf-js").sprintf;
 
 // VARS
 var STATIC_PATH = path.join(__dirname, "../static/");
+var HOSTNAME = process.env.HOSTNAME || "localhost";
 var PORT = process.env.PORT || 4000;
 var PRODUCTION = process.env.NODE_ENV === "production";
 
@@ -70,5 +71,6 @@ app.use(function(err, req, res, next) {
 
 // START THE SERVER
 // =============================================================================
-app.listen(PORT);
-logger.info("Listening at http://localhost:" + PORT);
+app.listen(PORT, HOSTNAME, function(){
+    logger.info("Listening at http://%s:%s", HOSTNAME, PORT);
+});

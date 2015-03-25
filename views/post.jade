@@ -1,4 +1,8 @@
 extends layout
+
+block title
+  title!= post.title
+
 block content
   article.post
     header.post-header

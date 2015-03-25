@@ -29,22 +29,32 @@ if (process.env.NODE_ENV === "production") {
 
 module.exports = {
     trace: function() {
-        logger.trace(sprintf.apply(this, arguments));
+        log("trace", arguments);
     },
     debug: function() {
-        logger.debug(sprintf.apply(this, arguments));
+        log("debug", arguments);
     },
     info: function () {
-        logger.info(sprintf.apply(this, arguments));
+        log("info", arguments);
     },
     warn: function () {
-        logger.warn(sprintf.apply(this, arguments));
+        log("warn", arguments);
     },
     error: function () {
-        logger.error(sprintf.apply(this, arguments));
+        log("error", arguments);
     },
     fatal: function () {
-        logger.fatal(sprintf.apply(this, arguments));
+        log("fatal", arguments);
     },
     getLogger: log4js.getLogger
 };
+
+function log(level, args) {
+    var params = args ? Array.prototype.slice.call(args) : [];
+
+    if (params.length > 1 && (typeof params[1] === "string" || params[1] instanceof String)) {
+        logger[level](sprintf.apply(null, args));
+    } else {
+        logger[level](JSON.stringify(params, true))
+    }
+}

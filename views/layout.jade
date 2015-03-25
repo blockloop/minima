@@ -9,7 +9,8 @@ html(lang='en')
     link(rel="stylesheet", href="/poole.min.css", type="style/css")
     link(rel="stylesheet", href="/lanyon.min.css", type="style/css")
     link(rel="stylesheet", href="/app.css", type="style/css")
-    title Minima
+    block title
+      title BrettJ.me
   body.home-template
     input#sidebar-checkbox.sidebar-checkbox(type='checkbox')
     #sidebar.sidebar
@@ -27,8 +28,7 @@ html(lang='en')
             small  Things I dwell on
       .container.content
           block content
-      nav.pagination(role='navigation')
-        span.page-number Page 1 of 1
+      block pagination
     label.sidebar-toggle(for='sidebar-checkbox')
     script.
       (function() {
