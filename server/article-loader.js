@@ -16,7 +16,7 @@ var isBackground = config.refreshEveryMins > 0;
 
 module.exports = function() {
     this.loader = function(req, res, next) {
-        next();
+        next(); // no need to wait on refresh to render the page
         if (!req.url.match(/.(css|js)$/) && !isBackground) {
             checkForRefresh();
         }
@@ -26,6 +26,7 @@ module.exports = function() {
 refresh();
 
 if (isBackground) {
+    logger.info("running refresh in the background ever %s minute(s)", config.refreshEveryMins);
     setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);
 }
 
@@ -33,7 +34,7 @@ function checkForRefresh() {
     var minsSinceLastRun = moment().diff(lastCheckDate, "minutes", true);
 
     if (minsSinceLastRun >= config.refreshEveryMins) {
-        logger.info("Last refresh was %s. Refreshing...", moment(lastCheckDate).fromNow());
+        logger.info("last refresh was %s. Refreshing now...", moment(lastCheckDate).fromNow());
         refresh();
     }
 }
@@ -58,14 +59,12 @@ function receiveArticle(remote) {
             logger.trace("unpublishing %s", remote.title);
             removePost(local);
         } else if (!local || remote.modifiedDate > local.modifiedDate) {
-            remote = extend(true, local || {}, remote);
+            var extended = extend(true, local || {}, remote);
 
-            articleSource.getPageContent(remote)
+            articleSource.getPageContent(extended)
                 .then(persistArticle, logger.err)
                 .catch(logger.err);
         } else {
-            logger.trace("REMOTE %s: %s", remote.slug, moment(remote.modifiedDate).toDate());
-            logger.trace("LOCAL %s: %s", local.slug, local.modifiedDate);
             logger.info("%s is already the latest version", remote.slug);
         }
     });
@@ -80,7 +79,7 @@ function persistArticle(article) {
 
     Post.findOneAndUpdate({slug: article.slug}, upsert, {upsert: true}, function(err) {
         if (err) {
-            logger.fatal(err);
+            logger.error(err);
         } else {
             logger.info("post saved. Title: %s", upsert.title);
         }
@@ -92,7 +91,7 @@ function removePost(post) {
         if (err) {
             logger.error("ERROR removing %s which was marked unpublished", post.title);
         } else {
-            logger.trace("successfully unpublished %s", post.title);
+            logger.info("successfully unpublished %s", post.title);
         }
     });
 }
