@@ -15,13 +15,9 @@ var default_ = {
     }
 };
 
-var production = extend(true, default_, {
+var production = extend(true, {}, default_, {
     rootUrl: "http://brettj.me",
     refreshEveryMins: 5
 });
 
-module.exports = getForEnv(process.env.NODE_ENV);
-
-function getForEnv(env) {
-    return (env === "production") ? production : default_;
-}
+module.exports = (process.env.NODE_ENV === "production") ? production : default_;
