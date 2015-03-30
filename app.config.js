@@ -6,13 +6,30 @@ var default_ = {
         name: "Brett Jones"
     },
     prettyDateFormat: "MMMM D, YYYY",
-    articleMiddleware: "minima-evernote-loader",
-    refreshEveryMins: 0,
+    articleMiddleware: "minima-dropbox-loader",
+    refreshEveryMins: 0.5,
+
+    admin: {
+        username: "brett",
+        password: "***REMOVED***"
+    },
 
     "minima-evernote-loader": {
         notebookName: "minima",
         authToken: "***REMOVED***"
+    },
+
+    "minima-dropbox-loader": {
+        folder: "minima",
+        key: "",
+        secret: "",
+        authToken: "***REMOVED***",
+        filter: function(file) {
+            return true;
+        }
     }
+
+
 };
 
 var production = extend(true, {}, default_, {

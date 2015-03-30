@@ -6,6 +6,7 @@ var config = require("../app.config");
 var logger = require("./logger");
 var extend = require("extend");
 
+logger.info("using %s middleware", config.articleMiddleware);
 var ArticleSource = require(config.articleMiddleware);
 var middlewareLogger = logger.getLogger(config.articleMiddleware);
 var middlewareConfig = config[config.articleMiddleware];
@@ -26,7 +27,7 @@ module.exports = function() {
 refresh();
 
 if (isBackground) {
-    logger.info("running refresh in the background ever %s minute(s)", config.refreshEveryMins);
+    logger.info("running refresh in the background every %s minute(s)", config.refreshEveryMins);
     setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);
 }
 
@@ -34,7 +35,7 @@ function checkForRefresh() {
     var minsSinceLastRun = moment().diff(lastCheckDate, "minutes", true);
 
     if (minsSinceLastRun >= config.refreshEveryMins) {
-        logger.info("last refresh was %s. Refreshing now...", moment(lastCheckDate).fromNow());
+        logger.info("last refresh was %s. refreshing now...", moment(lastCheckDate).fromNow());
         refresh();
     }
 }
@@ -49,21 +50,25 @@ function refresh() {
 }
 
 function receiveArticle(remote) {
-    Post.findBySlug(remote.slug, function(err, locals) {
-        if (err) { return logger.fatal(err); }
+    logger.trace("receiving article: %s", JSON.stringify(remote));
 
+    Post.findByIdentifier(remote.identifier, function(err, locals) {
+        if (err) {
+            return logger.fatal(err);
+        }
         var local = locals[0];
 
-        if (remote.unpublished === true) {
-            if (local == null) { return null; }
+        if (remote.unpublished) {
+            if (!local) {
+                return null;
+            }
             logger.trace("unpublishing %s", remote.title);
             removePost(local);
         } else if (!local || remote.modifiedDate > local.modifiedDate) {
             var extended = extend(true, local || {}, remote);
 
             articleSource.getPageContent(extended)
-                .then(persistArticle, logger.err)
-                .catch(logger.err);
+                .done(persistArticle);
         } else {
             logger.info("%s is already the latest version", remote.slug);
         }

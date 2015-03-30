@@ -17,6 +17,5 @@
         "no-comma-dangle": [0],
         "indent": [1, 4],
         "no-mixed-spaces-and-tabs": [2],
-        "no-unused-vars": [1],
     }
 }

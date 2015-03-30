@@ -5,6 +5,7 @@ var uuid = require("node-uuid");
 var PostSchema = new Schema({
     identifier: {
         type: String,
+        index: true,
         default: uuid
     },
     title: {
@@ -35,6 +36,10 @@ var PostSchema = new Schema({
 
 PostSchema.static("findBySlug", function (slug, callback) {
     return this.find({ slug: slug }, callback);
+});
+
+PostSchema.static("findByIdentifier", function (identifer, callback) {
+    return this.find({ identifer: identifer }, callback);
 });
 
 module.exports = mongoose.model("Post", PostSchema);
