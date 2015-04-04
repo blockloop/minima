@@ -11,7 +11,7 @@ var default_ = {
 
     admin: {
         username: 'brett',
-        password: '***REMOVED***'
+        password: ''
     },
 
     'minima-evernote-loader': {
