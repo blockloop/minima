@@ -11,7 +11,7 @@
         "strict": true,
         "eol-last": false,
         "no-underscore-dangle": false,
-        "quotes": [1, "double", "avoid-escape"],
+        "quotes": [1, "single", "avoid-escape"],
         "no-space-before-semi": false,
         "no-wrap-func": [1],
         "no-comma-dangle": [0],

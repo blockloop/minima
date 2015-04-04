@@ -1,18 +1,18 @@
-"use strict";
+'use strict';
 
-var moment = require("moment");
-var Post = require("./models/post");
-var config = require("../app.config");
-var logger = require("./logger");
-var extend = require("extend");
+var moment = require('moment');
+var Post = require('./models/post');
+var config = require('../app.config');
+var logger = require('./logger');
+var extend = require('extend');
 
-logger.info("using %s middleware", config.articleMiddleware);
+logger.info('using %s middleware', config.articleMiddleware);
 var ArticleSource = require(config.articleMiddleware);
 var middlewareLogger = logger.getLogger(config.articleMiddleware);
 var middlewareConfig = config[config.articleMiddleware];
 var articleSource = new ArticleSource(middlewareLogger, middlewareConfig);
 
-var lastCheckDate = moment("1970-01-01");
+var lastCheckDate = moment('1970-01-01');
 var isBackground = config.refreshEveryMins > 0;
 
 module.exports = function() {
@@ -22,20 +22,21 @@ module.exports = function() {
             checkForRefresh();
         }
     };
+    this.authentication = articleSource.authenticate;
 };
 
 refresh();
 
 if (isBackground) {
-    logger.info("running refresh in the background every %s minute(s)", config.refreshEveryMins);
+    logger.info('running refresh in the background every %s minute(s)', config.refreshEveryMins);
     setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);
 }
 
 function checkForRefresh() {
-    var minsSinceLastRun = moment().diff(lastCheckDate, "minutes", true);
+    var minsSinceLastRun = moment().diff(lastCheckDate, 'minutes', true);
 
     if (minsSinceLastRun >= config.refreshEveryMins) {
-        logger.info("last refresh was %s. refreshing now...", moment(lastCheckDate).fromNow());
+        logger.info('last refresh was %s. refreshing now...', moment(lastCheckDate).fromNow());
         refresh();
     }
 }
@@ -50,7 +51,7 @@ function refresh() {
 }
 
 function receiveArticle(remote) {
-    logger.trace("receiving article: %s", JSON.stringify(remote));
+    logger.trace('receiving article: %s', JSON.stringify(remote));
 
     Post.findByIdentifier(remote.identifier, function(err, locals) {
         if (err) {
@@ -62,7 +63,7 @@ function receiveArticle(remote) {
             if (!local) {
                 return null;
             }
-            logger.trace("unpublishing %s", remote.title);
+            logger.trace('unpublishing %s', remote.title);
             removePost(local);
         } else if (!local || remote.modifiedDate > local.modifiedDate) {
             var extended = extend(true, local || {}, remote);
@@ -70,23 +71,23 @@ function receiveArticle(remote) {
             articleSource.getPageContent(extended)
                 .done(persistArticle);
         } else {
-            logger.info("%s is already the latest version", remote.slug);
+            logger.info('%s is already the latest version', remote.slug);
         }
     });
 }
 
 function persistArticle(article) {
     var post = new Post(article);
-    post.markModified("modifiedDate");
+    post.markModified('modifiedDate');
     var upsert = post.toObject();
-    logger.info("persisting '%s': %s", article.slug, upsert.title);
+    logger.info('persisting "%s": %s', article.slug, upsert.title);
     delete upsert._id;
 
     Post.findOneAndUpdate({slug: article.slug}, upsert, {upsert: true}, function(err) {
         if (err) {
             logger.error(err);
         } else {
-            logger.info("post saved. Title: %s", upsert.title);
+            logger.info('post saved. Title: %s', upsert.title);
         }
     });
 }
@@ -94,9 +95,9 @@ function persistArticle(article) {
 function removePost(post) {
     Post.remove({ slug: post.slug }, function(err) {
         if (err) {
-            logger.error("ERROR removing %s which was marked unpublished", post.title);
+            logger.error('ERROR removing %s which was marked unpublished', post.title);
         } else {
-            logger.info("successfully unpublished %s", post.title);
+            logger.info('successfully unpublished %s', post.title);
         }
     });
 }

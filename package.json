@@ -4,7 +4,7 @@
   "description": "A blog engine where you can do what you want",
   "main": "server/index.js",
   "directories": {
-    "test": "test"
+    "test": ""
   },
   "dependencies": {
     "basic-auth": "^1.0.0",
@@ -15,25 +15,25 @@
     "extend": "^2.0.0",
     "glob": "^5.0.1",
     "jade": "^1.9.2",
-    "jasmine-node-karma": "^1.6.1",
     "log4js": "^0.6.22",
-    "marked": "^0.3.3",
     "minima-evernote-loader": "file:///Users/bjones027/projects/minima-evernote-loader",
     "minima-dropbox-loader": "file:///Users/bjones027/projects/minima-dropbox-loader",
     "moment": "^2.9.0",
     "mongoose": "^3.6.20",
     "morgan": "^1.0.1",
     "node-uuid": "^1.4.3",
-    "phantomjs": "^1.9.16",
     "q": "^1.2.0",
     "slug": "^0.8.0",
     "sprintf-js": "^1.0.2"
   },
   "devDependencies": {
-    "mocha": "^2.2.0"
+    "chai": "^2.2.0",
+    "expect.js": "^0.3.1",
+    "mocha": "^2.2.0",
+    "sinon": "^1.14.1"
   },
   "scripts": {
-    "test": "jasmine-node-karma test"
+    "test": "node_modules/.bin/mocha --recursive"
   },
   "repository": {
     "type": "git",
