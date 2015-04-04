@@ -15,15 +15,16 @@ var default_ = {
     },
 
     'minima-evernote-loader': {
-        notebookName: 'minima',
-        authToken: '***REMOVED***'
+        notebookName: '',
+        authToken: '',
+        sandbox: false
     },
 
     'minima-dropbox-loader': {
         folder: 'minima',
         key: '',
         secret: '',
-        authToken: '***REMOVED***',
+        authToken: '',
         filter: function(file) {
             return true;
         }
