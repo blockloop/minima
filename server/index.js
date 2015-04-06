@@ -18,8 +18,10 @@ var HOSTNAME = process.env.HOSTNAME || 'localhost';
 var PORT = process.env.PORT || 4000;
 var isProd = process.env.NODE_ENV === 'production';
 
-// configure app
+// CONFIGURE
 app.use(articleLoader.loader);
+app.use('/admin/connect', articleLoader.connect);
+app.use('/admin/connect_callback', articleLoader.connectCallback);
 
 app.use(morgan({
     format: isProd ? 'tiny' : 'dev',

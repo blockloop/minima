@@ -1,0 +1,10 @@
+extends layout
+
+block title
+  title Connect
+
+block content
+  form(action="/admin/connect")
+    button(type="submit")
+      | Connect&nbsp;
+      span!= middleware

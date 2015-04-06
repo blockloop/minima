@@ -5,12 +5,20 @@ var Post = require('./models/post');
 var config = require('../app.config');
 var logger = require('./logger');
 var extend = require('extend');
+var Path = require('path');
+var Store = require('./store');
+
+var middlewareConfig = extend(true, {}, config[config.articleMiddleware], {
+    callbackUrl: Path.join(config.rootUrl, 'admin/connect_callback')
+        .replace('\\', '/')
+});
+
+var articleStore = new Store(config.articleMiddleware);
 
 logger.info('using %s middleware', config.articleMiddleware);
 var ArticleSource = require(config.articleMiddleware);
 var middlewareLogger = logger.getLogger(config.articleMiddleware);
-var middlewareConfig = config[config.articleMiddleware];
-var articleSource = new ArticleSource(middlewareLogger, middlewareConfig);
+var articleSource = new ArticleSource(middlewareLogger, middlewareConfig, articleStore);
 
 var lastCheckDate = moment('1970-01-01');
 var isBackground = config.refreshEveryMins > 0;
@@ -22,15 +30,23 @@ module.exports = function() {
             checkForRefresh();
         }
     };
-    this.authentication = articleSource.authenticate;
+
+    this.connect = articleSource.connect;
+
+    this.connectCallback = articleSource.connectCallback;
+
+    if (isBackground) {
+        logger.info('running refresh in the background every %s minute(s)', config.refreshEveryMins);
+        setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);
+    }
+
+    refresh();
 };
 
-refresh();
 
-if (isBackground) {
-    logger.info('running refresh in the background every %s minute(s)', config.refreshEveryMins);
-    setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);
-}
+/********************
+ * PRIVATE
+ ********************/
 
 function checkForRefresh() {
     var minsSinceLastRun = moment().diff(lastCheckDate, 'minutes', true);
@@ -46,7 +62,7 @@ function refresh() {
     try {
         articleSource.listPages(receiveArticle);
     } catch (e) {
-        logger.fatal(e);
+        logger.fatal('ERROR refreshing: %s', e.stack);
     }
 }
 
