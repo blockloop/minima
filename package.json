@@ -4,7 +4,7 @@
   "description": "A blog engine where you can do what you want",
   "main": "server/index.js",
   "directories": {
-    "test": ""
+    "test": "test"
   },
   "dependencies": {
     "basic-auth": "^1.0.0",
@@ -23,8 +23,7 @@
     "morgan": "^1.0.1",
     "node-uuid": "^1.4.3",
     "q": "^1.2.0",
-    "slug": "^0.8.0",
-    "sprintf-js": "^1.0.2"
+    "slug": "^0.8.0"
   },
   "devDependencies": {
     "chai": "^2.2.0",

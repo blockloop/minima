@@ -6,19 +6,24 @@ var config = require('../app.config');
 var logger = require('./logger');
 var extend = require('extend');
 var Path = require('path');
-var Store = require('./store');
+var store = require('./store');
+var util = require('util');
 
 var middlewareConfig = extend(true, {}, config[config.articleMiddleware], {
     callbackUrl: Path.join(config.rootUrl, 'admin/connect_callback')
         .replace('\\', '/')
 });
 
-var articleStore = new Store(config.articleMiddleware);
 
+var articleSource;
 logger.info('using %s middleware', config.articleMiddleware);
-var ArticleSource = require(config.articleMiddleware);
-var middlewareLogger = logger.getLogger(config.articleMiddleware);
-var articleSource = new ArticleSource(middlewareLogger, middlewareConfig, articleStore);
+store(config.articleMiddleware).then(function(db) {
+    var ArticleSource = require(config.articleMiddleware);
+    var middlewareLogger = logger.getLogger(config.articleMiddleware);
+    articleSource = new ArticleSource(middlewareLogger, middlewareConfig, db);
+    refresh();
+});
+
 
 var lastCheckDate = moment('1970-01-01');
 var isBackground = config.refreshEveryMins > 0;
@@ -31,16 +36,22 @@ module.exports = function() {
         }
     };
 
-    this.connect = articleSource.connect;
+    // this is wrapped this way because trying to directly assign it
+    // causes an error because articleSource is not yet defined
+    this.connect = function() {
+        articleSource.connect.apply(this, arguments);
+    };
 
-    this.connectCallback = articleSource.connectCallback;
+    // this is wrapped this way because trying to directly assign it
+    // causes an error because articleSource is not yet defined
+    this.connectCallback = function() {
+        articleSource.connectCallback.apply(this, arguments);
+    };
 
     if (isBackground) {
         logger.info('running refresh in the background every %s minute(s)', config.refreshEveryMins);
         setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);
     }
-
-    refresh();
 };
 
 
@@ -67,7 +78,7 @@ function refresh() {
 }
 
 function receiveArticle(remote) {
-    logger.trace('receiving article: %s', JSON.stringify(remote));
+    logger.trace('receiving article: %s', util.inspect(remote));
 
     Post.findByIdentifier(remote.identifier, function(err, locals) {
         if (err) {

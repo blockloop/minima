@@ -8,7 +8,7 @@ var path = require('path');
 var mongoose = require('mongoose');
 var ArticleLoader = require('./article-loader');
 var logger = require('./logger');
-var sprintf = require('sprintf-js').sprintf;
+var util = require('util');
 
 var articleLoader = new ArticleLoader();
 
@@ -66,7 +66,7 @@ app.use('/', router);
 // =============================================================================
 app.use(function(err, req, res, next) {
     if (err) {
-        var msg = sprintf('%s\n%s', err.message, err.stack);
+        var msg = util.format('%s\n%s', err.message, err.stack);
         logger.error(msg);
         res.status(500);
 
