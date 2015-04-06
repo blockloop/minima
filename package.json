@@ -1,6 +1,6 @@
 {
   "name": "minima",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "A blog engine where you can do what you want",
   "main": "server/index.js",
   "directories": {
