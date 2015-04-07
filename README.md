@@ -57,61 +57,93 @@ Examples:
 How you write your middleware is irrelevant.  The only requirements is that you exports an Object
 (which will be constructed) and expose certain methods for Minima to use. They are as follows:
 
- 1. connect
- 1. connectCallback
- 1. listPages
- 1. getPageContent
+ 1. [connect](#connect)
+ 1. [connectCallback](#connectCallback)
+ 1. [listPages](#listPages)
+ 1. [getPageContent](#getPageContent)
 
 
 ## Constructor
 
 Your constructor will be passed three things: logger, config, and store.
 
-## logger: For any logging, tracing, errors, etc
+Signature: `function(logger, config, store) {}`
 
-#### Usage
+ 1. logger - an instance of [log4js][]. It is highly recommended that you use this so that
+ debugging issues doesn't become an issue in the future. All logging methods use [util.format][]
+ because readability.
+ 1. config - object containing the configuration values for your middleware.  Also contains
+ `callbackUrl` for oauth purposes (which will directly invoke the connectCallback method of your
+ middleware.
+ 1. store - a key/value store which exposes `get(key)`, `set(key, value)`, and `remove(key)`.  It
+ is sandboxed from the rest of the application. Use this sparingly (i.e. storing oauth tokens).
 
-`logger.error(messageFormat, [variables])`
+## connect
 
- * Instance of [log4js][]
- * Methods: trace, debug, info, warn, error, fatal
- * All methods use [util.format][] because readability.
-
-#### Examples
-
-`logger.trace('retrieving %s having id %s', note.title, note.id)`
-
-`logger.error('Could not find content for %s', note.title)`
-
-## Config
-
- * An object containing the configuration values for your middleware.
- * Also contains `callbackUrl` for oauth purposes (which will directly invoke the connectCallback
- method of your middleware.
-
-## Store
-
-#### Usage
-
-`var token = store.get('oauthToken')`
-
-`store.set('oauthToken', token)`
-
-`store.remove('oauthToken')`
-
- * Key/Value store.
- * Gives each middleware the ability to interact with a persistent storage. It is sandboxed from
-the rest of the application. (useful for storing oauth tokens so the user doesn't have to
-authenticate every time).
-
-## Connect
+Signature: `function(req, res, next){}`
 
 Called from the '/admin/connect' page. When the user first loads the application they will be
-directed to connect their middleware. This function is called directly from Express. You have full
-access to the request and response objects. This might change in the future. Your method signature
-should look like a traditional express endpoint `function(req, res, next){}`.
+directed to connect their middleware. Middleware.connect is called directly from Express. You have
+full access to the request and response objects. This might change in the future. In this method you
+should perform your typical oauth functions, passing the config.callbackUrl so that the oauth
+provider invokes your middleware's [connectCallback](#connectCallback) function.
+
+## connectCallback
+
+Signature: `function(req, res, next) {}`
+
+This is only necessary if you're authorization process requires a callback URL (i.e oauth). In your
+[connect](#connect) method you can use the config.callbackUrl to give to your oauth provider. Once
+the oauth passes the provider should invoke this method. Once you've completed the oauth you should
+persist the authentication into the [store](#store) and attempt to retrieve it in your
+[constructor](#constructor).
+
+## listPages
+
+Signature: `function(callback) {}`
+
+ 1. callback: a Callback function to be invoked with **each** page.  When invoking the callback
+ you should pass one single object which should match the following:
+
+```js
+{
+    identifier: // some unique identifier that your middleware can identify this note by,
+    title: // the title to be shown on the page
+    slug: // the slug to use in the url for this page (will default to [slug][] the title)
+    createDate: // Date (defaults to Date.now)
+    modifiedDate: // Date (defaults to Date.now) and used to determine if an update is needed
+    tags: // tags for the page
+    unpublished: // boolean - passed if the article should be unpublished
+}
+```
+
+## getPageContent
+
+Only called when a page detects an update. This prevents Minima from having to load every page each
+time the application starts. Sometimes it is not possible for your middleware to work this way (e.g.
+Dropbox). If this is the case then you should cache the pages content when you receive it during the
+listPages method and fetch that cached content during getPageContent.
+
+Signature: `function(note) {}`
+
+ 1. note - an object containing everything received from [listPages](#listPages)
+
+Returns:
+
+ 1. [Q.promise][Q promise]
+
+Promise should be resolved with the FULL NOTE. Not just the content. This is necessary because the
+receiving end of this callback is stateless and does not retain each call it makes to
+getPageContent. When the promise is resolved it will depend on the Note object in it's entirety.
+
+
+To see implementations of middleware see the examples listed above.
+
 
 
 
  [log4js]: https://github.com/nomiddlename/log4js-node
  [util.format]: https://nodejs.org/api/util.html#util_util_format_format
+ [slug]: https://www.npmjs.com/package/slug
+ [Q promise]: https://www.npmjs.com/package/q
+
