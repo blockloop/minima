@@ -1,6 +1,6 @@
-var mongoose = require("mongoose");
+var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var uuid = require("node-uuid");
+var uuid = require('node-uuid');
 
 var PostSchema = new Schema({
     identifier: {
@@ -11,13 +11,13 @@ var PostSchema = new Schema({
     title: {
         type: String,
         required: true,
-        unique: true,
+        unique: true
     },
     slug: {
         type: String,
         unique: true,
         index: true,
-        required: true,
+        required: true
     },
     createDate: {
         type: Date,
@@ -31,15 +31,15 @@ var PostSchema = new Schema({
         type: String,
         required: true
     },
-    tags: Array,
+    tags: Array
 });
 
-PostSchema.static("findBySlug", function (slug, callback) {
+PostSchema.static('findBySlug', function (slug, callback) {
     return this.find({ slug: slug }, callback);
 });
 
-PostSchema.static("findByIdentifier", function (identifer, callback) {
-    return this.find({ identifer: identifer }, callback);
+PostSchema.static('findByIdentifier', function (identifier, callback) {
+    return this.find({ identifier: identifier }, callback);
 });
 
-module.exports = mongoose.model("Post", PostSchema);
+module.exports = mongoose.model('Post', PostSchema);

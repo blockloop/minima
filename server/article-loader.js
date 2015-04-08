@@ -3,7 +3,7 @@
 var moment = require('moment');
 var Post = require('./models/post');
 var config = require('../app.config');
-var logger = require('./logger');
+var log = require('./logger');
 var extend = require('extend');
 var Path = require('path');
 var store = require('./store');
@@ -16,12 +16,16 @@ var middlewareConfig = extend(true, {}, config[config.articleMiddleware], {
 
 
 var articleSource;
-logger.info('using %s middleware', config.articleMiddleware);
-store(config.articleMiddleware).then(function(db) {
+log.info('using %s middleware', config.articleMiddleware);
+store(config.articleMiddleware).done(function(db) {
     var ArticleSource = require(config.articleMiddleware);
-    var middlewareLogger = logger.getLogger(config.articleMiddleware);
+    var middlewareLogger = log.getLogger(config.articleMiddleware);
     articleSource = new ArticleSource(middlewareLogger, middlewareConfig, db);
-    refresh();
+
+    if (articleSource.isConnected()) {
+        log.trace('middleware is connected. Refreshing...');
+        refresh();
+    }
 });
 
 
@@ -39,17 +43,19 @@ module.exports = function() {
     // this is wrapped this way because trying to directly assign it
     // causes an error because articleSource is not yet defined
     this.connect = function() {
+        log.trace('connecting %s', config.articleMiddleware);
         articleSource.connect.apply(this, arguments);
     };
 
     // this is wrapped this way because trying to directly assign it
     // causes an error because articleSource is not yet defined
     this.connectCallback = function() {
+        log.trace('connectCallback triggered for %s', config.articleMiddleware);
         articleSource.connectCallback.apply(this, arguments);
     };
 
     if (isBackground) {
-        logger.info('running refresh in the background every %s minute(s)', config.refreshEveryMins);
+        log.info('running refresh in the background every %s minute(s)', config.refreshEveryMins);
         setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);
     }
 };
@@ -60,10 +66,14 @@ module.exports = function() {
  ********************/
 
 function checkForRefresh() {
+    if (articleSource && articleSource.isConnected()) {
+        return;
+    }
+
     var minsSinceLastRun = moment().diff(lastCheckDate, 'minutes', true);
 
     if (minsSinceLastRun >= config.refreshEveryMins) {
-        logger.info('last refresh was %s. refreshing now...', moment(lastCheckDate).fromNow());
+        log.info('last refresh was %s. refreshing now...', moment(lastCheckDate).fromNow());
         refresh();
     }
 }
@@ -73,16 +83,16 @@ function refresh() {
     try {
         articleSource.listPages(receiveArticle);
     } catch (e) {
-        logger.fatal('ERROR refreshing: %s', e.stack);
+        log.fatal('ERROR refreshing: %s', e.stack);
     }
 }
 
 function receiveArticle(remote) {
-    logger.trace('receiving article: %s', util.inspect(remote));
+    log.trace('receiving article: %s', util.inspect(remote));
 
     Post.findByIdentifier(remote.identifier, function(err, locals) {
         if (err) {
-            return logger.fatal(err);
+            return log.fatal(err);
         }
         var local = locals[0];
 
@@ -90,7 +100,7 @@ function receiveArticle(remote) {
             if (!local) {
                 return null;
             }
-            logger.trace('unpublishing %s', remote.title);
+            log.trace('unpublishing %s', remote.title);
             removePost(local);
         } else if (!local || remote.modifiedDate > local.modifiedDate) {
             var extended = extend(true, local || {}, remote);
@@ -98,7 +108,7 @@ function receiveArticle(remote) {
             articleSource.getPageContent(extended)
                 .done(persistArticle);
         } else {
-            logger.info('%s is already the latest version', remote.slug);
+            log.info('%s is already the latest version', remote.slug);
         }
     });
 }
@@ -107,14 +117,14 @@ function persistArticle(article) {
     var post = new Post(article);
     post.markModified('modifiedDate');
     var upsert = post.toObject();
-    logger.info('persisting "%s": %s', article.slug, upsert.title);
+    log.info('persisting "%s": %s', article.slug, upsert.title);
     delete upsert._id;
 
     Post.findOneAndUpdate({slug: article.slug}, upsert, {upsert: true}, function(err) {
         if (err) {
-            logger.error(err);
+            log.error(err);
         } else {
-            logger.info('post saved. Title: %s', upsert.title);
+            log.info('post saved. Title: %s', upsert.title);
         }
     });
 }
@@ -122,9 +132,9 @@ function persistArticle(article) {
 function removePost(post) {
     Post.remove({ slug: post.slug }, function(err) {
         if (err) {
-            logger.error('ERROR removing %s which was marked unpublished', post.title);
+            log.error('ERROR removing %s which was marked unpublished', post.title);
         } else {
-            logger.info('successfully unpublished %s', post.title);
+            log.info('successfully unpublished %s', post.title);
         }
     });
 }
