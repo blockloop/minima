@@ -54,6 +54,12 @@ module.exports = function() {
         articleSource.connectCallback.apply(this, arguments);
     };
 
+    // this is wrapped this way because trying to directly assign it
+    // causes an error because articleSource is not yet defined
+    this.isConnected = function() {
+        return articleSource.isConnected();
+    };
+
     if (isBackground) {
         log.info('running refresh in the background every %s minute(s)', config.refreshEveryMins);
         setInterval(checkForRefresh, config.refreshEveryMins * 60 * 1000);

@@ -20,7 +20,13 @@ var isProd = process.env.NODE_ENV === 'production';
 
 // CONFIGURE
 app.use(articleLoader.loader);
-app.use('/admin/connect', articleLoader.connect);
+app.use('/admin/connect', function(req, res, next){
+    if (articleLoader.isConnected()) {
+        res.redirect('/');
+    } else {
+        articleLoader.connect(req, res, next);
+    }
+});
 app.use('/admin/connect_callback', articleLoader.connectCallback);
 
 app.use(morgan({
