@@ -58,9 +58,10 @@ How you write your middleware is irrelevant.  The only requirements is that you 
 (which will be constructed) and expose certain methods for Minima to use. They are as follows:
 
  1. [connect](#connect)
- 1. [connectCallback](#connectCallback)
- 1. [listPages](#listPages)
- 1. [getPageContent](#getPageContent)
+ 1. [connectCallback](#connectcallback)
+ 1. [isConnected](#isconnected)
+ 1. [listPages](#listpages)
+ 1. [getPageContent](#getpagecontent)
 
 
 ## Constructor
@@ -97,6 +98,12 @@ This is only necessary if you're authorization process requires a callback URL (
 the oauth passes the provider should invoke this method. Once you've completed the oauth you should
 persist the authentication into the [store](#store) and attempt to retrieve it in your
 [constructor](#constructor).
+
+## isConnected
+
+Signature: `function() {}`
+
+Returns: boolean - `true` if the middleware has been authorized and is prepared to take requests
 
 ## listPages
 
